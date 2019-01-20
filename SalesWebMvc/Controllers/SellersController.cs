@@ -6,12 +6,15 @@ using Microsoft.AspNetCore.Mvc;
 using SalesWebMvc.Models;
 using SalesWebMvc.Services;
 using SalesWebMvc.Models.ViewModels;
+using Microsoft.EntityFrameworkCore;
+
 namespace SalesWebMvc.Controllers
 {
     public class SellersController : Controller
     {
         private readonly SellerService _sellerService;
         private readonly DepartmentService _departmentService;
+        private readonly SalesWebMvcContext _context;
 
         public IActionResult Index()
         {
@@ -19,10 +22,11 @@ namespace SalesWebMvc.Controllers
             return View(list);
         }
 
-        public SellersController(SellerService sellerService, DepartmentService departmentService)
+        public SellersController(SellerService sellerService, DepartmentService departmentService, SalesWebMvcContext context)
         {
             _sellerService = sellerService;
             _departmentService = departmentService;
+            _context = context;
         }
 
         public IActionResult Create()
@@ -37,6 +41,47 @@ namespace SalesWebMvc.Controllers
         {
             _sellerService.Insert(seller);
             return RedirectToAction(nameof(Index));
+        }
+
+        public IActionResult Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var obj = _sellerService.FindById(id.Value);
+            if (obj == null)
+            {
+                return NotFound();
+            }
+            return View(obj);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Delete(int id)
+        {
+            _sellerService.Remove(id);
+            return RedirectToAction(nameof(Index));
+        }
+
+        public IActionResult Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var seller = _sellerService.FindById(id.Value);
+            if (seller == null)
+            {
+                return NotFound();
+            }
+            return View(seller);
+        }
+
+        public IActionResult Edit()
+        {
+            throw new NotImplementedException();
         }
     }
 }
