@@ -20,7 +20,7 @@ namespace SalesWebMvc.Controllers
 
         public IActionResult Index()
         {
-            var list = _sellerService.FindAll();
+            var list = _sellerService.EncontrarTodos();
             return View(list);
         }
 
@@ -33,7 +33,8 @@ namespace SalesWebMvc.Controllers
 
         public IActionResult Create()
         {
-            var departments = _departmentService.FindAll();
+            
+            var departments = _departmentService.EncontrarTodos();
             var viewModel = new SellerFormViewModel { Departments = departments };
             return View(viewModel);
         }
@@ -41,6 +42,12 @@ namespace SalesWebMvc.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(Seller seller)
         {
+            if (!ModelState.IsValid)
+            {
+                var departments = _departmentService.EncontrarTodos();
+                var viewModel = new SellerFormViewModel { Seller = seller, Departments = departments };
+                return View(viewModel);
+            }
             _sellerService.Insert(seller);
             return RedirectToAction(nameof(Index));
         }
@@ -51,7 +58,7 @@ namespace SalesWebMvc.Controllers
             {
                 return RedirectToAction(nameof(Error), new { message = "Id nulo" });
             }
-            var obj = _sellerService.FindById(id.Value);
+            var obj = _sellerService.EncontrarPorId(id.Value);
             if (obj == null)
             {
                 return RedirectToAction(nameof(Error), new { message = "Id não encontrado" });
@@ -63,7 +70,7 @@ namespace SalesWebMvc.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
         {
-            _sellerService.Remove(id);
+            _sellerService.Remover(id);
             return RedirectToAction(nameof(Index));
         }
 
@@ -75,7 +82,7 @@ namespace SalesWebMvc.Controllers
 
             }
 
-            var seller = _sellerService.FindById(id.Value);
+            var seller = _sellerService.EncontrarPorId(id.Value);
             if (seller == null)
             {
                 return RedirectToAction(nameof(Error), new { message = "Id não encontrado" });
@@ -91,14 +98,14 @@ namespace SalesWebMvc.Controllers
                 return RedirectToAction(nameof(Error), new { message = "Id nulo" });
 
             }
-            var obj = _sellerService.FindById(id.Value);
+            var obj = _sellerService.EncontrarPorId(id.Value);
             if (obj == null)
             {
                 return RedirectToAction(nameof(Error), new { message = "Id não encontrado" });
 
             }
 
-            List<Department> departments = _departmentService.FindAll();
+            List<Department> departments = _departmentService.EncontrarTodos();
             SellerFormViewModel viewModel = new SellerFormViewModel { Seller = obj, Departments = departments };
 
             return View(viewModel);
@@ -108,6 +115,13 @@ namespace SalesWebMvc.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, Seller seller)
         {
+            if (!ModelState.IsValid)
+            {
+                var departments = _departmentService.EncontrarTodos();
+                var viewModel = new SellerFormViewModel { Seller = seller, Departments = departments };
+                return View(viewModel);
+            }
+
             if (id != seller.Id)
             {
                 return RedirectToAction(nameof(Error), new { message = "Id não corresponde ao informado" });

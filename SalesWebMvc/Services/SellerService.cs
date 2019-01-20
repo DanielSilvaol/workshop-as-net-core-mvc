@@ -17,7 +17,7 @@ namespace SalesWebMvc.Services
             _context = context;
         }
 
-        public List<Seller> FindAll()
+        public List<Seller> EncontrarTodos()
         {
             return _context.Seller.ToList();
         }
@@ -30,13 +30,13 @@ namespace SalesWebMvc.Services
         }
 
         //FindById
-        public Seller FindById(int id)
+        public Seller EncontrarPorId(int id)
         {
             return _context.Seller.Include(obj => obj.Department).FirstOrDefault(obj => obj.Id == id);
         }
 
         //Remover
-        public void Remove(int id)
+        public void Remover(int id)
         {
             var obj = _context.Seller.Find(id);
 
